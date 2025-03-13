@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edugraph - Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js Library -->
+    <style>
+        body {
+            background-color: #0a0f1d;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+        }
+        h1, h2 {
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .highlight {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px auto;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #00d4ff;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #00d4ff;
+            color: black;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        tr:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        canvas {
+            max-width: 100%;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        a.download-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #00d4ff, #5b6eff);
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 10px;
+            margin: 20px auto;
+            transition: all 0.3s ease-in-out;
+        }
+        a.download-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+        }
+        /* Center alignment for Top Three Rank table */
+        .center-table {
+            text-align: center;
+        }
+        .center-table th, .center-table td {
+            text-align: center;
+        }
+
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            p {
+                font-size: 16px;
+            }
+            .highlight {
+                font-size: 16px;
+                padding: 10px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            a.download-button {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 18px;
+            }
+            p {
+                font-size: 14px;
+            }
+            .highlight {
+                font-size: 14px;
+                padding: 8px;
+            }
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 6px;
+            }
+            a.download-button {
+                padding: 10px 20px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>EduGraph Result Summary</h1>
+        <h3>{{ programme_name }}</h3>
+        <h3>{{ exam_name }}</h3>
+
+        <p class="highlight">Total Students: {{ total_students }}</p>
+        <p class="highlight">Total Students Passed: {{ total_pass }}</p>
+        <p class="highlight">Total Students Failed: {{ total_fail }}</p>
+
+        <!-- Pie Chart for Pass/Fail -->
+        <canvas id="passFailChart"></canvas>
+
+        <h2>List of Failed Students & Their Subjects</h2>
+        <table>
+            <tr>
+                <th>Name of Students</th>
+                <th>Failed Subjects</th>
+            </tr>
+            {% for student in failed_students %}
+            <tr>
+                <td>{{ student.name }}</td>
+                <td>
+                    {% for subject in student.failed_subjects.all %}
+                        {{ subject.subject_name }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No students failed</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Top Three Rank based on SGPA</h2>
+        <table class="center-table">
+            <tr>
+                <th>Rank</th>
+                <th>Student's Name & SGPA</th>
+            </tr>
+            {% for rank, students in top_students %}
+            <tr>
+                <td>{{ rank }}</td>
+                <td>
+                    {% for student in students %}
+                        {{ student.0 }} &nbsp;&nbsp; - &nbsp; <i>SGPA: {{ student.1 }} </i><br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No top rankers available</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Subjects & Number of fails</h2>
+        <table>
+            <tr>
+                <th>Subjects</th>
+                <th>Number of Fails</th>
+            </tr>
+            {% for subject, count in subject_fail_count %}
+            <tr>
+                <td>{{ subject }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No subjects with failed students</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Chart.js Script -->
+    <script>
+        const ctx = document.getElementById('passFailChart').getContext('2d');
+        const totalStudents = {{ total_students }};
+        const totalPass = {{ total_pass }};
+        const totalFail = {{ total_fail }};
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Passed', 'Failed'],
+                datasets: [{
+                    data: [totalPass, totalFail],
+                    backgroundColor: ['#00d4ff', '#ff4b4b'], // Blue for pass, Red for fail
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- Download Button -->
+    <a href="{% url 'download_results' %}" class="download-button">
+        Download Results as PDF
+    </a>
+    
+</body>
+</html>

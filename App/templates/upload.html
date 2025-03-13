@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Upload PDFs - EduGraph</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .background-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle, rgba(0,0,255,0.3) 10%, rgba(0,0,128,0.2) 50%, rgba(0,0,0,0.9) 100%);
+        }
+
+        .ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .ripple div {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(0, 0, 255, 0.6);
+            border-radius: 50%;
+            animation: rippleEffect 4s infinite ease-out;
+            opacity: 0;
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(131, 129, 129, 0.8);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-in-out;
+            transform: translateY(100vh);
+            opacity: 0;
+            animation: slideIn 1.2s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 60px #00d4ff;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #00d4ff;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"], button {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            outline: none;
+        }
+
+        input[type="file"]:focus {
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+        }
+
+        button {
+            background: linear-gradient(90deg, #00d4ff, #000080);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgb(124, 118, 118);
+        }
+
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                max-width: 400px;
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            input[type="file"], button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                max-width: 350px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input[type="file"], button {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="ripple">
+        <div style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div style="top: 50%; left: 30%; animation-delay: 1s;"></div>
+        <div style="top: 70%; left: 60%; animation-delay: 2s;"></div>
+        <div style="top: 40%; left: 80%; animation-delay: 3s;"></div>
+    </div>
+    
+    <div class="container">
+        <h1>EduGraph</h1>
+        <form method="post" enctype="multipart/form-data" onsubmit="disableButton(event)">
+            {% csrf_token %}
+            <input type="file" name="pdf_files" multiple>
+            <button type="submit" id="generateInsightsBtn">Generate Insights</button>
+        </form>
+        
+        <script>
+        function disableButton(event) {
+            let button = document.getElementById("generateInsightsBtn");
+            button.disabled = true; // Disable button after click
+            button.innerText = "Processing..."; // UI feedback
+        }
+        </script>
+        
+    </div>
+</body>
+</html>

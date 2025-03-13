@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edugraph - Downloaded Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 11px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .date-time {
+            text-align: left;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+        h1, h2 {
+            text-transform: uppercase;
+            font-size: 20px;
+            line-height: 1.5;
+            margin: 2px 0;
+        }
+        
+        h3 {
+            margin: 0.5px 0; /* Reduced margin for h3 */
+            line-height: 1.5; /* Adjusted line height */
+        }
+        .student-stats {
+            margin: 5px 0; /* Reduced margin for the stats section */
+            line-height: 1.5; /* Adjusted line height */
+            
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 6px;
+            text-align: left;
+        }
+        th {
+            background: #f2f2f2;
+            font-weight: bold;
+        }
+        .center-table th, .center-table td {
+            text-align: center;
+        }
+        .bold {
+            font-weight: bold;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 15px;
+            }
+            table {
+                font-size: 10px;
+            }
+            th, td {
+                padding: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="date-time"><strong>Date:</strong> {{ current_date }} | <strong>Time:</strong> {{ current_time }}</div>
+    <h1>🏆 EDUGRAPH RESULT SUMMARY</h1>
+    <h2>{{ programme_name }}</h2>
+    <div class="student-stats">
+        <span class="bold">Total Students:</span> {{ total_students }} &nbsp;&nbsp; 
+        <span class="bold">Total Students Passed:</span> {{ total_pass }} &nbsp;&nbsp; 
+        <span class="bold">Total Students Failed:</span> {{ total_fail }}
+    </div>
+    
+    <h3>{{ exam_name }}</h3>
+    <div class="container">
+        <h2>LIST OF FAILED STUDENTS & THEIR SUBJECTS</h2>
+        <table>
+            <tr>
+                <th>Name of Students</th>
+                <th>Failed Subjects</th>
+            </tr>
+            {% for student in failed_students %}
+            <tr>
+                <td>{{ student.name }}</td>
+                <td>
+                    {% for subject in student.failed_subjects.all %}
+                        {{ subject.subject_name }}{% if not forloop.last %},<br>{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No students failed</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>TOP THREE RANK BASED ON SGPA</h2>
+        <table class="center-table">
+            <tr>
+                <th>Rank</th>
+                <th>Student's Name & SGPA</th>
+            </tr>
+            {% for rank, students in top_students %}
+            <tr>
+                <td>{{ rank }}</td>
+                <td>
+                    {% for student in students %}
+                        {{ student.0 }} - <i>SGPA: {{ student.1 }}</i>{% if not forloop.last %}<br>{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No top rankers available</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>SUBJECTS & NUMBER OF FAILS</h2>
+        <table>
+            <tr>
+                <th>Subjects</th>
+                <th>Number of Fails</th>
+            </tr>
+            {% for subject, count in subject_fail_count %}
+            <tr>
+                <td>{{ subject }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No subjects with failed students</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
